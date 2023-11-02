@@ -1,0 +1,50 @@
+﻿@page "/"
+@inject IJSRuntime js
+
+<PageTitle>Index</PageTitle>
+
+<EditForm Model="@Barras" OnValidSubmit="Submit" class="w-full max-w-md mx-auto">
+    <div class="mb-4">
+        <input value="@Barras.Code" @onchange="NovoCode" type="text" id="Code"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+    </div>
+</EditForm>
+
+@foreach (var cod in Codigos)
+{
+    <p>@cod</p>
+}
+
+@code {
+    public List<string> Codigos { get; set; } = new();
+    public CodigoBarras Barras = new();
+
+    public class CodigoBarras
+    {
+        public string Code { get; set; } = "";
+    }
+
+    private async Task Submit()
+    {
+    }
+
+    private void NovoCode(ChangeEventArgs e){
+        var code = e.Value.ToString();
+        Codigos.Add(code);
+        Barras = new();
+        Task.Run(async () => await Focus("Code"));
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await Focus("Code");
+        }
+    }
+
+   public async Task Focus(string elementId)
+    {
+        await js.InvokeVoidAsync("focusById", elementId);
+    }
+}
